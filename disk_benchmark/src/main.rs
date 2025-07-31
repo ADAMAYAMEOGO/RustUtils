@@ -7,16 +7,13 @@ use std::path::Path;
 fn main() {
     let file_path = "test_benchmark.tmp";
 
-    let data_size_mb = 20000;
+    let data_size_mb = 1000;
     let data = vec![0u8; 1024 * 1024]; // 1 Mo = 1024 * 1024 octets
 
     let start_write = Instant::now();
     let mut file = File::create(file_path).expect("Failed to create file");
-    for i in 0..data_size_mb {
+    for _i in 0..data_size_mb {
         file.write_all(&data).expect("Failed to write data");
-        if i % 1000 == 0 {
-            println!("Writing progress: {} MB", i / 1000);
-        }
     }
     let write_duration = start_write.elapsed();
 
@@ -28,7 +25,7 @@ fn main() {
         let mut buffer = vec![0u8; data.len()];
         file.read_exact(&mut buffer).expect("Failed to read data");
         if i % 1000 == 0 {
-            println!("Reading progress: {} MB", i / 1000);
+            println!("Reading progress: {} MB", i);
         }
     }
     let read_duration = start_read.elapsed();
