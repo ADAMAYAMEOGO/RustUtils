@@ -1,0 +1,2 @@
+Bonjour Rust!
+Deuxème ligne.

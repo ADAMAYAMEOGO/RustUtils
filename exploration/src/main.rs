@@ -1,18 +1,17 @@
-mod gz;
-
 use anyhow::Result;
-use clap::{arg, command, Parser, Subcommand};
+use clap::{Parser, Subcommand, CommandFactory};
 use dialoguer::{theme::ColorfulTheme, Input, Select};
-use std::path::Path;
 
 #[derive(Parser, Debug)]
 #[command(
     author, version,
-    about = "A hybrid CLI tool: arguments + interactive mode",
-    long_about = "This program compresses and decompresses files using Gzip (streaming mode, no memory load)."
+    about = "Un CLI hybride : arguments + mode interactif",
+    long_about = "This program help you compress (and later decompress) any file using Gzip. "
 )]
+
+
 struct Cli {
-    #[arg(short, long)]
+     #[arg(short, long)]
     interactive: bool,
 
     #[command(subcommand)]
@@ -21,12 +20,10 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Compress a file (output: <file>.gz if no --out)
     Compress {
         #[arg(short, long)]
         file: String,
     },
-    /// Decompress a .gz file (output: file without .gz)
     Decompress {
         #[arg(short, long)]
         file: String,
@@ -42,23 +39,22 @@ fn interactive_mode() -> Result<()> {
         .item("Decompress a file")
         .default(0)
         .interact()?;
-
     match choice {
         0 => {
             let file: String = Input::with_theme(&theme)
                 .with_prompt("Enter the file to compress")
                 .interact_text()?;
-            let out = gz::compress_file(Path::new(&file), None)?;
-            println!("✅ Compressed to: {}", out.display());
+            println!("Compressing file: {}", file);
+            // Call your compression function here
         }
         1 => {
             let file: String = Input::with_theme(&theme)
-                .with_prompt("Enter the .gz file to decompress")
+                .with_prompt("Enter the file to decompress")
                 .interact_text()?;
-            let out = gz::decompress_file(Path::new(&file), None)?;
-            println!("✅ Decompressed to: {}", out.display());
+            println!("Decompressing file: {}", file);
+            // Call your decompression function here
         }
-        _ => unreachable!(),
+        _ => unreachable!(),    
     }
     Ok(())
 }
@@ -66,20 +62,23 @@ fn interactive_mode() -> Result<()> {
 fn run_command(cmd: Commands) -> Result<()> {
     match cmd {
         Commands::Compress { file } => {
-            let out = gz::compress_file(Path::new(&file), None)?;
-            println!("✅ Compressed to: {}", out.display());
+            println!("Compressing file: {}", file);
+            // Call your compression function here
         }
         Commands::Decompress { file } => {
-            let out = gz::decompress_file(Path::new(&file), None)?;
-            println!("✅ Decompressed to: {}", out.display());
+            println!("Decompressing file: {}", file);
+            
         }
     }
     Ok(())
 }
 
+
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
+    // Si l'utilisateur force --interactive ou ne passe aucune sous-commande, on ouvre le menu.
     match (cli.interactive, cli.command) {
         (true, _) | (false, None) => interactive_mode()?,
         (false, Some(cmd)) => run_command(cmd)?,
