@@ -1,7 +1,7 @@
 mod gz;
 
 use anyhow::Result;
-use clap::{arg, command, Parser, Subcommand};
+use clap::{Parser, Subcommand, CommandFactory};
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 use std::path::Path;
 
@@ -21,12 +21,10 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Compress a file (output: <file>.gz if no --out)
     Compress {
         #[arg(short, long)]
         file: String,
     },
-    /// Decompress a .gz file (output: file without .gz)
     Decompress {
         #[arg(short, long)]
         file: String,
